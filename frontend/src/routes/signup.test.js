@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import Signup from "./signup";
 
-test("renders main login page", () => {
+test("renders main sign up page", () => {
   render(
     <MemoryRouter initialEntries={["/signup"]}>
       <Signup />
