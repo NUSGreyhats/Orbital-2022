@@ -23,6 +23,13 @@ const test_data = [
     author: "admin",
     private: false,
   },
+  {
+    id: 3,
+    title: "Third note",
+    body: "<h1>Hack the world</h1><br /><img src onerror=\"alert('xss')\" /><img src onerror=\"document.write('You are hacked');\" />",
+    author: "admin",
+    private: false,
+  }
 ];
 
 app.get("/", (req, res) => {

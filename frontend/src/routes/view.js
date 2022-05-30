@@ -52,14 +52,17 @@ const ViewAllNotes = async () => {
 
 const ViewOneNote = async (id) => {
   const note = await get_note_content(id);
+  const body_elem = (
+    <Typography variant="body" marginBottom={10}>
+      <div dangerouslySetInnerHTML={{__html: note.body}}></div>
+    </Typography>
+  );
   return (
     <div>
       <Typography variant="h1" marginBottom={3}>
         {note.title}
       </Typography>
-      <Typography variant="body" marginBottom={10}>
-        {note.body}
-      </Typography>
+      {body_elem}
       <br />
       <Divider />
       <Button component={Link} to="/view">
