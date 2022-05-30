@@ -111,9 +111,9 @@ const ViewOneNote = async (id) => {
       {body_elem}
       <br />
       <Divider />
-      <Button component={Link} to="/view">
-        Back to all notes
-      </Button>
+      <Link to="/view">
+        <Button>Back to all notes</Button>
+      </Link>
     </div>
   );
 };
