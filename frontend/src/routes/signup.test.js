@@ -1,13 +1,13 @@
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import Login from "./login";
+import Signup from "./signup";
 
-test("renders main signup page", () => {
+test("renders main login page", () => {
   render(
-    <MemoryRouter initialEntries={["/login"]}>
-      <Login />
+    <MemoryRouter initialEntries={["/signup"]}>
+      <Signup />
     </MemoryRouter>
   );
-  const linkElement = screen.getByText("Sign In");
+  const linkElement = screen.getByText("Sign Up");
   expect(linkElement).toBeInTheDocument();
 });
