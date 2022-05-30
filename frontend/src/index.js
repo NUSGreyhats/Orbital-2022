@@ -8,6 +8,7 @@ import Login from "./routes/login";
 import NavBar from "./components/navbar";
 import NewNote from "./routes/new";
 import ViewNote from "./routes/view";
+import Signup from "./routes/signup";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -18,6 +19,7 @@ root.render(
       <Route path="/login" element={<Login />} />
       <Route path="/new" element={<NewNote />} />
       <Route path="/view" element={<ViewNote />} />
+      <Route path="/signup" element={<Signup />} />
     </Routes>
   </BrowserRouter>
 );
