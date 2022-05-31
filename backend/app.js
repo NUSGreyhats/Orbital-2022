@@ -26,7 +26,7 @@ const test_data = [
   {
     id: 3,
     title: "Third note",
-    body: "<h1>Hack the world</h1><br /><img src onerror=\"alert('xss')\" /><img src onerror=\"document.write('You are hacked');<a href='/view'>return</a>\" />",
+    body: "<h1>Hack the world</h1><br /><img src onerror=\"alert('xss')\" /><img src onerror=\"document.write('<p>You are hacked</p><a href=\\'/view\\'>return</a>');\" />",
     author: "admin",
     private: false,
   },
