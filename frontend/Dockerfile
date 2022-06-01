@@ -1,5 +1,5 @@
 # First image is for building the client files
-FROM node:14.17-alpine as build
+FROM node:latest as build
 
 ENV SKIP_PREFLIGHT_CHECK 'true'
 
@@ -7,10 +7,10 @@ WORKDIR /app
 
 COPY . .
 
-RUN yarn install
+RUN npm install
 
 ENV DISABLE_ESLINT_PLUGIN=true
-RUN yarn build
+RUN npm run build
 
 # Second image is for serving the files
 FROM nginx:stable-alpine
