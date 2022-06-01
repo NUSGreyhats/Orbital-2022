@@ -16,7 +16,7 @@ import { Link } from "react-router-dom";
 import Cookies from "js-cookie";
 
 const pages = ["New", "View"];
-const settings = ["Profile", "My Notes", "Logout"];
+const settings = ["Logout"];
 const title = "Notes.js";
 
 const NavBar = () => {
