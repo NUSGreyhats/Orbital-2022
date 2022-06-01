@@ -1,13 +1,19 @@
-FROM node:latest
-
-ENV NODE_ENV=production
+FROM python:3.8-slim-buster
 
 WORKDIR /app
 
-COPY ["package.json", "package-lock.json*", "./"]
+COPY requirements.txt requirements.txt
+RUN pip3 install -r requirements.txt
 
-RUN npm install --production
+ENV FLASK_DEBUG 1
 
 COPY . .
+RUN chmod -R 777 data
 
-CMD [ "node", "server.js" ]
+RUN touch bugs.txt && chmod 666 bugs.txt
+
+RUN useradd -ms /bin/bash web
+USER web
+
+
+CMD [ "python3", "app.py"]

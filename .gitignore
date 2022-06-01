@@ -106,3 +106,8 @@ dist
 
 # Ignore Mongodb files
 mongodb-data/
+
+# Ignore for python
+env/
+__pycache__/
+.pytest_cache/
