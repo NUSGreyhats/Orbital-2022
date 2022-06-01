@@ -4,6 +4,7 @@ from flask import Flask, jsonify, request, session
 from util import initial_users, initial_notes
 from dataclasses import dataclass
 import subprocess
+from flask_cors import CORS
 
 
 def create_app():
@@ -11,6 +12,7 @@ def create_app():
     app.secret_key = os.urandom(24)
     app.users_db_path = USERS_DB_PATH
     app.notes_db_path = NOTES_DB_PATH
+    CORS(app, resources={"/*": {'origins': "*"}})
 
     @app.route('/')
     def index():
@@ -38,7 +40,7 @@ def create_app():
             # Search for the notes
             # Use prepared statements here to prevent SQLi
             notes = cur.execute(SEARCH_NOTES_QUERY, (query,))
-            results = list(map(lambda x: (x[0], x[1]), notes))
+            results = list(map(lambda x: {"id":x[0], "title":x[1]}, notes))
 
         return jsonify(results)
 
@@ -105,7 +107,7 @@ def create_app():
             # There should be only one result of the query, since id is unique
             note = notes[0]
 
-        return jsonify({'id': note.id, 'name': note.name, 'content': note.content, 'user': note.user, 'private': note.private})
+        return jsonify({'id': note.id, 'title': note.name, 'body': note.content, 'user': note.user, 'private': note.private})
 
     @app.route('/report', methods=['POST'])
     def report_bug():
@@ -242,7 +244,7 @@ def create_db(app) -> None:
 
 # Run the website as main
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 3000))
+    port = int(os.environ.get("PORT", 3001))
     app = create_app()
     create_db(app)
     app.run(host='0.0.0.0', port=port)

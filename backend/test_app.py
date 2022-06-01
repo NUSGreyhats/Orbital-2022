@@ -61,7 +61,8 @@ def test_get_notes_page_success(client):
     """Test if notes are retrieved correctly"""
     response = client.get("/notes")
     assert response.status_code == 200
-    assert response.json == [[1, 'Administration Note'], [3, 'Wow']]
+    assert response.json == [
+        {"id": 1, "title": 'Administration Note'}, {"id": 3, "title": 'Wow'}]
 
 
 def test_post_note_page_success(client):
@@ -73,7 +74,7 @@ def test_post_note_page_success(client):
     })
 
     assert response.status_code == 200
-    assert response.json == [[3, 'Wow']]
+    assert response.json == [{"id": 3, "title": 'Wow'}]
 
 
 def test_post_notes_page_invalid_fail(client):
@@ -228,8 +229,8 @@ def test_create_note_success(client):
     assert response.status_code == 200
     assert response.json == {
         'id': 4,
-        'name': 'Hello!',
-        'content': 'World!',
+        'title': 'Hello!',
+        'body': 'World!',
         'private': False,
         'user': 'admin',
     }
@@ -248,8 +249,8 @@ def test_view_note_valid_id_success(client):
     assert response.status_code == 200
     assert response.json == {
         'id': 1,
-        'name': 'Administration Note',
-        'content': 'Please do not try to hack us, we are proven to be super secure!',
+        'title': 'Administration Note',
+        'body': 'Please do not try to hack us, we are proven to be super secure!',
         'private': False,
         'user': 'manager',
     }

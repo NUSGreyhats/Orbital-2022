@@ -12,7 +12,7 @@ export const get_notes = async () => {
 };
 
 export const get_note_content = async (id) => {
-  return axios.get(api_url + "notes/" + id).then(
+  return axios.get(api_url + "note/" + id).then(
     (response) => response.data,
   ).catch((err) => {
     return {

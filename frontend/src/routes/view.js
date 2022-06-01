@@ -100,6 +100,7 @@ const ViewOneNote = async (id) => {
   const note = await get_note_content(id);
   const body_elem = (
     <Typography variant="body" marginBottom={10}>
+      Author: {note.user}
       <div dangerouslySetInnerHTML={{ __html: note.body }}></div>
     </Typography>
   );
