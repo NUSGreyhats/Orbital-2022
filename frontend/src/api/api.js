@@ -21,3 +21,14 @@ export const get_note_content = async (id) => {
     };
   });
 };
+
+export const create_note = async (title, body, is_private) => {
+  let data = {
+    name: title,
+    content: body,
+  }
+  if (is_private) {
+    data.private = true;
+  }
+  return axios.post(api_url + "note/create", data)
+}
