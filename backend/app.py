@@ -5,13 +5,11 @@ from util import initial_users, initial_notes
 from dataclasses import dataclass
 import subprocess
 
-# Initialise the application
-
 
 def create_app():
     app = Flask(__name__)
     app.secret_key = os.urandom(24)
-    app.user_db_path = USERS_DB_PATH
+    app.users_db_path = USERS_DB_PATH
     app.notes_db_path = NOTES_DB_PATH
 
     @app.route('/')
@@ -22,16 +20,20 @@ def create_app():
     # Reflected XSS Methods
 
     @app.route('/notes', methods=['POST', 'GET'])
-    def gallery():
+    def notes():
         """Page to showcase Reflected XSS"""
         if request.method == 'GET':
             query = '_'  # load everything
         elif request.method == 'POST':
+            if request.json is None:
+                return jsonify({'error': 'Invalid JSON'}), 400
             # Get form data
-            query = request.form['query']
+            query = request.json.get('query', None)
+            if query is None:
+                return jsonify({"error": "Missing query"}), 400
 
         # Fetch the data from the database
-        with sqlite3.connect(NOTES_DB_PATH) as db:
+        with sqlite3.connect(app.notes_db_path) as db:
             cur = db.cursor()
             # Search for the notes
             # Use prepared statements here to prevent SQLi
@@ -42,21 +44,24 @@ def create_app():
 
     # CSRF Methods
 
-    @app.route('/changepassword')
+    @app.route('/changepassword', methods=['POST'])
     def changepassword():
         """Page to showcase CSRF"""
         if 'user' not in session:  # not logged in!
             return jsonify({'error': 'You are not logged in!'})
 
-        if 'password_new' in request.args:  # we changing password bois
-            password_new = request.args['password_new']
-            with sqlite3.connect(app.user_db_path) as db:
+        if request.json is None:
+            return jsonify({'error': 'Invalid JSON'})
+
+        if 'new_password' in request.json:  # we changing password bois
+            password_new = request.json['new_password']
+            with sqlite3.connect(app.users_db_path) as db:
                 cursor = db.cursor()
                 cursor.execute(
                     "UPDATE users SET password=? WHERE username=?", (password_new, session['user']))
                 return jsonify({'message': 'Password changed successfully!'})
 
-        return jsonify({'message': 'please set a new password to change'})
+        return jsonify({'error': 'Please set a new password to change'})
 
     # Create a note
 
@@ -65,12 +70,18 @@ def create_app():
         if 'user' not in session:  # not logged in!
             return jsonify({'error': 'You are not logged in!'})
 
-        name = request.form['name']
-        content = request.form['content']
-        private = 'private' in request.form
+        if request.json is None:
+            return jsonify({'error': 'Invalid JSON'})
+
+        name = request.json.get('name', None)
+        content = request.json.get('content', None)
+        private = 'private' in request.json
         user = session['user']
 
-        with sqlite3.connect(NOTES_DB_PATH) as db:
+        if None in (name, content, user):
+            return jsonify({'error': 'Missing fields'})
+
+        with sqlite3.connect(app.notes_db_path) as db:
             cur = db.cursor()
             cur.execute(INSERT_NOTE_QUERY, (name, content, user, private))
             id = cur.lastrowid
@@ -82,31 +93,35 @@ def create_app():
     @app.route('/note/<int:id>')
     def view_note(id):
         """Page to showcase Stored XSS"""
-        with sqlite3.connect(NOTES_DB_PATH) as db:
+        with sqlite3.connect(app.notes_db_path) as db:
             cur = db.cursor()
             # Search for the note
             notes = list(map(result_to_note, cur.execute(
                 "SELECT * FROM notes WHERE id=?", (id,))))
             # Check if such a note was found
             if len(notes) == 0:
-                note = None
-            else:
-                # There should be only one result of the query, since id is unique
-                note = notes[0]
+                return jsonify({'error': 'Note does not exist'})
+
+            # There should be only one result of the query, since id is unique
+            note = notes[0]
 
         return jsonify({'id': note.id, 'name': note.name, 'content': note.content, 'user': note.user, 'private': note.private})
 
     @app.route('/report', methods=['POST'])
     def report_bug():
         """Page to showcase Command Injection"""
-        bug = request.form['bug']
+        if request.json is None:
+            return jsonify({'error': 'Invalid JSON'})
+        bug = request.json.get('bug')
+        if bug is None:
+            return jsonify({'error': 'Missing bug note'})
         output = subprocess.run(
             f"echo {bug} >> bugs.txt && echo 'Bug has been reported'", shell=True, capture_output=True)
         return jsonify({'message': 'Bug reported successfully!', 'output': output.stdout.decode('utf-8')})
 
     # SQLi Methods
 
-    def parse_args(username: str = None, password: str = None, **kwargs):
+    def parse_args(username: str = None, password: str = None, **_):
         """Parse the arguments from the user"""
         return username, password
 
@@ -117,18 +132,17 @@ def create_app():
         """Page to showcase SQL Injection"""
 
         # Check if the arguments are valid
-        data = request.form
+        data = request.json
         if data == None:
             return jsonify({"error": "Invalid arguments"})
 
         username, password = parse_args(**data)
-
         # Check for empty data
         if None in (username, password):
-            return jsonify({"error": "Invalid username or password"})
+            return jsonify({"error": "Empty username or password"})
 
         # Check if the entry exists
-        with sqlite3.connect(app.user_db_path) as db:
+        with sqlite3.connect(app.users_db_path) as db:
             cursor = db.cursor()
             query = LOGIN_QUERY.format(username, password)
             try:
@@ -139,11 +153,11 @@ def create_app():
 
         # If there are no users found
         if len(result) == 0:
-            return jsonify({"error": "Username not found"})
+            return jsonify({"error": "Invalid username or password"})
 
         # Set a cookie
         session['user'] = username
-        return jsonify({'message': 'Logged in successfully!', 'user': username})
+        return jsonify({'message': 'Logged in successfully!', 'username': result[0][0]})
 
     @app.route("/logout", methods=["POST"])
     def logout():
@@ -184,6 +198,14 @@ def result_to_note(tup):
 
 # Database methods
 
+def destroy_db(app) -> None:
+    with sqlite3.connect(app.users_db_path) as db:
+        cursor = db.cursor()
+        cursor.execute('DROP TABLE IF EXISTS users')
+
+    with sqlite3.connect(app.notes_db_path) as db:
+        cursor = db.cursor()
+        cursor.execute('DROP TABLE IF EXISTS notes')
 
 def create_db(app) -> None:
     if not os.path.exists('data'):
@@ -220,7 +242,7 @@ def create_db(app) -> None:
 
 # Run the website as main
 if __name__ == '__main__':
-    create_db()
     port = int(os.environ.get("PORT", 3000))
     app = create_app()
+    create_db(app)
     app.run(host='0.0.0.0', port=port)
