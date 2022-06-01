@@ -111,3 +111,5 @@ mongodb-data/
 env/
 __pycache__/
 .pytest_cache/
+test_*.db
+'file
