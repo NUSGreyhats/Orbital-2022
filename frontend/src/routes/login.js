@@ -11,9 +11,10 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { Navigate } from "react-router";
 import { Copyright } from "../components/copyright";
 import { Link } from "react-router-dom";
+import { login } from "../api/api";
+import Cookies from "js-cookie";
 
 const theme = createTheme();
 
@@ -21,12 +22,18 @@ export default function Login() {
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    // Process login information here
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
-    });
-    <Navigate to="/" />;
+
+    const resp = login(data.get("username"), data.get("password"));
+    resp.then((result) => {
+      const msg = result.data;
+      const elem = msg.error ? `Error: ${msg.error}` : msg.message;
+      if (!msg.error) {
+        document.location.href = "/";
+        Cookies.set("username", msg.username);
+      }
+      document.getElementById("result").innerHTML = elem;
+    })
+
   };
 
   return (
@@ -47,6 +54,8 @@ export default function Login() {
           <Typography component="h1" variant="h5">
             Sign in
           </Typography>
+          <Typography id="result" component="h1" variant="h6" />
+          <br />
           <Box
             component="form"
             onSubmit={handleSubmit}
@@ -57,10 +66,10 @@ export default function Login() {
               margin="normal"
               required
               fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
+              id="username"
+              label="Username"
+              name="username"
+              autoComplete="username"
               autoFocus
             />
             <TextField

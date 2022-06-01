@@ -12,7 +12,7 @@ def create_app():
     app.secret_key = os.urandom(24)
     app.users_db_path = USERS_DB_PATH
     app.notes_db_path = NOTES_DB_PATH
-    CORS(app, resources={"/*": {'origins': "*"}})
+    CORS(app, resources={"/*": {'origins': "*"}}, supports_credentials=True)
 
     @app.route('/')
     def index():

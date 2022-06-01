@@ -32,3 +32,15 @@ export const create_note = async (title, body, is_private) => {
   }
   return axios.post(api_url + "note/create", data)
 }
+
+export const login = async (username, password) => {
+  let data = {
+    username: username,
+    password: password,
+  }
+  return axios.post(api_url + "login", data)
+}
+
+export const logout = async () =>{
+  return axios.post(api_url + "logout")
+}
