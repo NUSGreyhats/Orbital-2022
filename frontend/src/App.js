@@ -1,24 +1,16 @@
-import logo from './logo.svg';
-import './App.css';
+import { Container, Typography, CssBaseline } from "@mui/material";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Container component="main" maxWidth="xs">
+      <CssBaseline />
+      <Typography variant="h2" marginBottom={3}>
+        Notes.js
+      </Typography>
+      <Typography variant="h5">
+        Over at Notes.js, we make sure that all your notes are safe and secure.
+      </Typography>
+    </Container>
   );
 }
 
