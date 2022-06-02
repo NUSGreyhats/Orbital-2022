@@ -34,13 +34,16 @@ def create_app():
             if query is None:
                 return jsonify({"error": "Missing query"}), 400
 
+        user = session.get('user', '')
+
         # Fetch the data from the database
         with sqlite3.connect(app.notes_db_path) as db:
             cur = db.cursor()
             # Search for the notes
             # Use prepared statements here to prevent SQLi
-            notes = cur.execute(SEARCH_NOTES_QUERY, (query,))
-            results = list(map(lambda x: {"id":x[0], "title":x[1]}, notes))
+            notes = cur.execute(SEARCH_NOTES_QUERY, (user, query,))
+            print(user)
+            results = list(map(lambda x: {"id": x[0], "title": x[1]}, notes))
 
         return jsonify(results)
 
@@ -148,7 +151,6 @@ def create_app():
                 "INSERT INTO users (username, password) VALUES (?, ?)", (username, password))
         return jsonify({'message': 'User created successfully!', 'username': username})
 
-
     # Login - SQLi
 
     @app.route('/login', methods=['POST'])
@@ -180,8 +182,9 @@ def create_app():
             return jsonify({"error": "Invalid username or password"})
 
         # Set a cookie
+        username = result[0][0]
         session['user'] = username
-        return jsonify({'message': 'Logged in successfully!', 'username': result[0][0]})
+        return jsonify({'message': 'Logged in successfully!', 'username': username})
 
     @app.route("/logout", methods=["POST"])
     def logout():
@@ -203,7 +206,7 @@ LOGIN_QUERY = ''' SELECT * FROM users WHERE username = '{}' AND password = '{}' 
 NOTES_DB_PATH = os.path.join('data', 'notes.db')
 CREATE_NOTE_QUERY = 'CREATE TABLE IF NOT EXISTS notes (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, content TEXT, user TEXT, private TINYINT)'
 INSERT_NOTE_QUERY = 'INSERT INTO notes(name, content, user, private) VALUES (?, ?, ?, ?)'
-SEARCH_NOTES_QUERY = 'SELECT id, name FROM notes p WHERE p.private <> 1 and p.name LIKE \'%\' || ? || \'%\''
+SEARCH_NOTES_QUERY = 'SELECT id, name FROM notes p WHERE (p.private <> 1 or p.user = ?) and p.name LIKE \'%\' || ? || \'%\''
 
 CHECK_TABLE_EXIST = ''' SELECT count(name) FROM sqlite_master WHERE type='table' AND name='{}' '''
 
@@ -222,6 +225,7 @@ def result_to_note(tup):
 
 # Database methods
 
+
 def destroy_db(app) -> None:
     with sqlite3.connect(app.users_db_path) as db:
         cursor = db.cursor()
@@ -230,6 +234,7 @@ def destroy_db(app) -> None:
     with sqlite3.connect(app.notes_db_path) as db:
         cursor = db.cursor()
         cursor.execute('DROP TABLE IF EXISTS notes')
+
 
 def create_db(app) -> None:
     if not os.path.exists('data'):

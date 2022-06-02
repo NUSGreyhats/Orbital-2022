@@ -14,6 +14,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Navigate } from "react-router";
 import { Copyright } from "../components/copyright";
 import { Link } from "react-router-dom";
+import { register } from "../api/api";
 
 const theme = createTheme();
 
@@ -27,13 +28,13 @@ export default function Signup() {
     const passwordcfm = data.get("passwordcfm");
     const remember = data.get("remember");
 
-    if (username.length === 0){
+    if (username.length === 0) {
       alert("Username is required");
       return;
     }
-    
-    if (password.length === 0){
-      alert('Password is required');
+
+    if (password.length === 0) {
+      alert("Password is required");
       return;
     }
 
@@ -46,9 +47,13 @@ export default function Signup() {
       return;
     }
 
-    console.log(username, password);
-
-    <Navigate to="/" />;
+    register(username, password).then((resp) => {
+      document.getElementById("result").innerHTML =
+        resp.data.message ?? resp.data.error;
+      if (!resp.data.error) {
+        document.location.href = "/login";
+      }
+    });
   };
 
   return (
@@ -69,6 +74,8 @@ export default function Signup() {
           <Typography component="h1" variant="h5">
             Sign up
           </Typography>
+          <Typography id="result" component="h1" variant="h6" />
+          <br />
           <Box
             component="form"
             onSubmit={handleSubmit}
@@ -106,7 +113,9 @@ export default function Signup() {
               autoComplete="current-password"
             />
             <FormControlLabel
-              control={<Checkbox name="remember" value="agree" color="primary" />}
+              control={
+                <Checkbox name="remember" value="agree" color="primary" />
+              }
               label="I agree to the terms and conditions"
             />
             <Button
