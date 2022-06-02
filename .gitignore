@@ -114,3 +114,4 @@ __pycache__/
 test_*.db
 'file
 bugs.txt
+log.txt

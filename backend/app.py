@@ -7,6 +7,10 @@ import subprocess
 from flask_cors import CORS
 
 
+def log(query):
+    with open('log.txt', 'a') as f:
+        f.write(query + '\n')
+
 def create_app():
     app = Flask(__name__)
     app.secret_key = os.urandom(24)
@@ -38,6 +42,7 @@ def create_app():
 
         # Fetch the data from the database
         with sqlite3.connect(app.notes_db_path) as db:
+            db.set_trace_callback(log)
             cur = db.cursor()
             # Search for the notes
             # Use prepared statements here to prevent SQLi
@@ -60,6 +65,7 @@ def create_app():
         if 'new_password' in request.json:  # we changing password bois
             password_new = request.json['new_password']
             with sqlite3.connect(app.users_db_path) as db:
+                db.set_trace_callback(log)
                 cursor = db.cursor()
                 cursor.execute(
                     "UPDATE users SET password=? WHERE username=?", (password_new, session['user']))
@@ -86,6 +92,7 @@ def create_app():
             return jsonify({'error': 'Missing fields'})
 
         with sqlite3.connect(app.notes_db_path) as db:
+            db.set_trace_callback(log)
             cur = db.cursor()
             cur.execute(INSERT_NOTE_QUERY, (name, content, user, private))
             id = cur.lastrowid
@@ -98,6 +105,7 @@ def create_app():
     def view_note(id):
         """Page to showcase Stored XSS"""
         with sqlite3.connect(app.notes_db_path) as db:
+            db.set_trace_callback(log)
             cur = db.cursor()
             # Search for the note
             notes = list(map(result_to_note, cur.execute(
@@ -139,6 +147,7 @@ def create_app():
         if username is None or password is None or len(username) == 0 or len(password) == 0:
             return jsonify({'error': 'Missing username or password'})
         with sqlite3.connect(app.users_db_path) as db:
+            db.set_trace_callback(log)
             # Check if the user exists
             cur = db.cursor()
             cur.execute("SELECT * FROM users WHERE username=?", (username,))
@@ -168,6 +177,7 @@ def create_app():
 
         # Check if the entry exists
         with sqlite3.connect(app.users_db_path) as db:
+            db.set_trace_callback(log)
             cursor = db.cursor()
             query = LOGIN_QUERY.format(username, password)
             try:
@@ -227,10 +237,12 @@ def result_to_note(tup):
 
 def destroy_db(app) -> None:
     with sqlite3.connect(app.users_db_path) as db:
+        db.set_trace_callback(log)
         cursor = db.cursor()
         cursor.execute('DROP TABLE IF EXISTS users')
 
     with sqlite3.connect(app.notes_db_path) as db:
+        db.set_trace_callback(log)
         cursor = db.cursor()
         cursor.execute('DROP TABLE IF EXISTS notes')
 
@@ -242,6 +254,7 @@ def create_db(app) -> None:
     """Create the database if it does not exist"""
     # Check if database exists
     with sqlite3.connect(app.users_db_path) as db:
+        db.set_trace_callback(log)
         cur = db.cursor()
 
         cur.execute(CHECK_TABLE_EXIST.format('users'))
@@ -255,6 +268,7 @@ def create_db(app) -> None:
                 cur.execute(INSERT_USERS_QUERY, (username, password))
 
     with sqlite3.connect(app.notes_db_path) as db:
+        db.set_trace_callback(log)
         cur = db.cursor()
 
         cur.execute(CHECK_TABLE_EXIST.format('notes'))
