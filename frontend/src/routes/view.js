@@ -79,9 +79,10 @@ const ViewAllNotes = async (searchParams, setSearchParams) => {
 
   if (search_term !== null && search_term.length > 0) {
     console.log("hit");
+    console.log(all_notes)
     note_items = all_notes.filter(
       (note) =>
-        note.title.includes(search_term) || note.body.includes(search_term)
+        note.title.includes(search_term)
     );
   }
 
