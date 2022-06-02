@@ -11,6 +11,7 @@ import ViewNote from "./routes/view";
 import Signup from "./routes/signup";
 import Logout from "./routes/logout";
 import axios from "axios";
+import ReportBug from "./routes/report_bug";
 
 axios.defaults.withCredentials = true;
 
@@ -25,6 +26,7 @@ root.render(
       <Route path="/view" element={<ViewNote />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/logout" element={<Logout />} />
+      <Route path="/report" element={<ReportBug />} />
     </Routes>
   </BrowserRouter>
 );

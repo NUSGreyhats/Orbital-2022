@@ -11,7 +11,6 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { Navigate } from "react-router";
 import { Copyright } from "../components/copyright";
 import { Link } from "react-router-dom";
 import { register } from "../api/api";
