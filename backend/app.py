@@ -42,7 +42,6 @@ def create_app():
             # Search for the notes
             # Use prepared statements here to prevent SQLi
             notes = cur.execute(SEARCH_NOTES_QUERY, (user, query,))
-            print(user)
             results = list(map(lambda x: {"id": x[0], "title": x[1]}, notes))
 
         return jsonify(results)
