@@ -113,3 +113,4 @@ __pycache__/
 .pytest_cache/
 test_*.db
 'file
+bugs.txt

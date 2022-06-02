@@ -56,7 +56,8 @@ export const register = async (username, password) => {
 };
 
 export const report_bug = async (report) => {
-  return axios.post(api_url + "report_bug", {
+  const data = {
     bug: report,
-  });
+  };
+  return axios.post(api_url + "report", data);
 };

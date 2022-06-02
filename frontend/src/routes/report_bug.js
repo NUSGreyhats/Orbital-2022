@@ -21,9 +21,9 @@ export default function ReportBug() {
     report_bug(data.get("bug"))
       .then((resp) => {
         document.getElementById("result").innerHTML =
-          resp.data.message ?? resp.data.error;
+          (resp.data.message ?? resp.data.error) + "Response: " + resp.data.output;
       })
-      .catch((err) => {
+      .catch((_) => {
         document.getElementById("result").innerHTML = "Network Error, please check the logs";
       });
     setHasReported(true);
