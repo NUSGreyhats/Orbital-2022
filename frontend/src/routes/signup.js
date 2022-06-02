@@ -22,10 +22,20 @@ export default function Signup() {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     // Process login information here
-    const email = data.get("email");
+    const username = data.get("username");
     const password = data.get("password");
     const passwordcfm = data.get("passwordcfm");
     const remember = data.get("remember");
+
+    if (username.length === 0){
+      alert("Username is required");
+      return;
+    }
+    
+    if (password.length === 0){
+      alert('Password is required');
+      return;
+    }
 
     if (password !== passwordcfm) {
       alert("Password and Confirm Password do not match.");
@@ -36,7 +46,7 @@ export default function Signup() {
       return;
     }
 
-    console.log(email, password);
+    console.log(username, password);
 
     <Navigate to="/" />;
   };
@@ -69,10 +79,10 @@ export default function Signup() {
               margin="normal"
               required
               fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
+              id="username"
+              label="Username"
+              name="username"
+              autoComplete="username"
               autoFocus
             />
             <TextField
@@ -90,13 +100,13 @@ export default function Signup() {
               required
               fullWidth
               name="passwordcfm"
-              label="ConfrimPassword"
-              type="passwordcfm"
+              label="Confirm Password"
+              type="password"
               id="passwordcfm"
               autoComplete="current-password"
             />
             <FormControlLabel
-              control={<Checkbox value="agree" color="primary" />}
+              control={<Checkbox name="remember" value="agree" color="primary" />}
               label="I agree to the terms and conditions"
             />
             <Button

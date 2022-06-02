@@ -44,3 +44,11 @@ export const login = async (username, password) => {
 export const logout = async () =>{
   return axios.post(api_url + "logout")
 }
+
+export const register = async (username, password) => {
+  let data = {
+    username: username,
+    password: password,
+  }
+  return axios.post(api_url + "register", data)
+}

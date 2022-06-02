@@ -127,6 +127,28 @@ def create_app():
         """Parse the arguments from the user"""
         return username, password
 
+    # Register
+    @app.route('/register', methods=['POST'])
+    def register():
+        data = request.json
+        if data is None:
+            return jsonify({'error': 'Invalid JSON'})
+        username, password = parse_args(**data)
+        if username is None or password is None or len(username) == 0 or len(password) == 0:
+            return jsonify({'error': 'Missing username or password'})
+        with sqlite3.connect(app.users_db_path) as db:
+            # Check if the user exists
+            cur = db.cursor()
+            cur.execute("SELECT * FROM users WHERE username=?", (username,))
+            if cur.fetchone() is not None:
+                return jsonify({'error': 'User already exists'})
+
+            # Insert the user
+            cur.execute(
+                "INSERT INTO users (username, password) VALUES (?, ?)", (username, password))
+        return jsonify({'message': 'User created successfully!', 'username': username})
+
+
     # Login - SQLi
 
     @app.route('/login', methods=['POST'])

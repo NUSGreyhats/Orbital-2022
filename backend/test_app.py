@@ -418,3 +418,84 @@ def test_logout_success(client):
     assert response.json == {
         'message': 'Logged out successfully!',
     }
+
+
+def test_register_invalid_data_fail(client):
+    """Test if user can login with invalid data"""
+    response = client.post('/register', data=json.dumps({
+        'username': 'admin',
+        'password': 'password',
+    }), headers={
+        'Content-Type': 'multipart/form-data',
+    })
+
+    assert response.status_code in (200, 400)
+    assert response.json in ({
+        'error': 'Invalid JSON',
+    }, None)
+
+
+def test_register_already_exists_fail(client):
+    """Test if user cannot register conflicting username"""
+    response = client.post('/register', data=json.dumps({
+        'username': 'admin',
+        'password': 'password',
+    }), headers={
+        'Content-Type': 'application/json',
+    })
+
+    assert response.status_code == 200
+    assert response.json == {
+        'error': 'User already exists'
+    }
+
+
+def test_register_empty_username_fail(client):
+    """Test if user cannot register with empty username"""
+    response = client.post('/register', data=json.dumps({
+        'password': 'Missing username or password',
+    }), headers={
+        'Content-Type': 'application/json',
+    })
+
+    assert response.status_code == 200
+    assert response.json == {
+        'error': 'Missing username or password'
+    }
+
+
+def test_register_empty_password_fail(client):
+    """Test if user cannot register with empty password"""
+    response = client.post('/register', data=json.dumps({
+        'username': 'Missing username or password',
+    }), headers={
+        'Content-Type': 'application/json',
+    })
+
+    assert response.status_code == 200
+    assert response.json == {
+        'error': 'Missing username or password'
+    }
+
+
+def test_register_success(client):
+    """Test if user can register successfully"""
+    response = client.post('/register', data=json.dumps({
+        'username': 'admin2',
+        'password': 'password',
+    }), headers={
+        'Content-Type': 'application/json',
+    })
+
+    assert response.status_code == 200
+    assert response.json == {
+        'message': 'User created successfully!',
+        'username': 'admin2',
+    }
+
+    resp = login(client, 'admin2', 'password')
+    assert resp.status_code == 200
+    assert resp.json == {
+        'message': 'Logged in successfully!',
+        'username': 'admin2',
+    }
