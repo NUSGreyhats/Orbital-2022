@@ -1,5 +1,4 @@
 import React from "react";
-import { Navigate } from "react-router-dom";
 import {
   Container,
   ThemeProvider,
@@ -12,6 +11,7 @@ import {
   CssBaseline,
   Typography,
 } from "@mui/material";
+import { create_note } from "../api/api";
 
 const theme = createTheme();
 
@@ -20,12 +20,13 @@ export default function NewNote() {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     // Process login information here
-    console.log({
-      title: data.get("title"),
-      body: data.get("body"),
-      private: data.get("private") !== null ,
-    });
-    <Navigate to="/" />;
+
+    const resp = create_note(data.get("title"), data.get("body"), data.get("private") !== null)
+    resp.then((result) => {
+      const msg = result.data
+      const elem = msg.error ? `Error: ${msg.error}` : msg.message
+      document.getElementById('result').innerHTML = elem;
+    })
   };
   return (
     <ThemeProvider theme={theme}>
@@ -44,6 +45,8 @@ export default function NewNote() {
           <Typography component="h1" variant="h5">
             Create a new note
           </Typography>
+          <Typography id="result" component="h1" variant="h6" />
+          <br />
           <Box component="form" onSubmit={handleSubmit}>
             <TextField fullWidth label="Title" name="title" />
             <br />

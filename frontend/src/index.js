@@ -9,6 +9,11 @@ import NavBar from "./components/navbar";
 import NewNote from "./routes/new";
 import ViewNote from "./routes/view";
 import Signup from "./routes/signup";
+import Logout from "./routes/logout";
+import axios from "axios";
+import ReportBug from "./routes/report_bug";
+
+axios.defaults.withCredentials = true;
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -20,6 +25,8 @@ root.render(
       <Route path="/new" element={<NewNote />} />
       <Route path="/view" element={<ViewNote />} />
       <Route path="/signup" element={<Signup />} />
+      <Route path="/logout" element={<Logout />} />
+      <Route path="/report" element={<ReportBug />} />
     </Routes>
   </BrowserRouter>
 );

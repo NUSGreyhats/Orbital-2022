@@ -79,9 +79,10 @@ const ViewAllNotes = async (searchParams, setSearchParams) => {
 
   if (search_term !== null && search_term.length > 0) {
     console.log("hit");
+    console.log(all_notes)
     note_items = all_notes.filter(
       (note) =>
-        note.title.includes(search_term) || note.body.includes(search_term)
+        note.title.includes(search_term)
     );
   }
 
@@ -100,6 +101,10 @@ const ViewOneNote = async (id) => {
   const note = await get_note_content(id);
   const body_elem = (
     <Typography variant="body" marginBottom={10}>
+      Author: {note.user}
+      <br />
+      Private: {note.private ? "Yes" : "No"}
+      <hr />
       <div dangerouslySetInnerHTML={{ __html: note.body }}></div>
     </Typography>
   );

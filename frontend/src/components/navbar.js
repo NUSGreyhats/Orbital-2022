@@ -13,10 +13,10 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
 import { Link } from "react-router-dom";
-import Cookie from "js-cookie";
+import Cookies from "js-cookie";
 
 const pages = ["New", "View"];
-const settings = ["Profile", "My Notes", "Logout"];
+const settings = ["Report","Logout"];
 const title = "Notes.js";
 
 const NavBar = () => {
@@ -38,7 +38,7 @@ const NavBar = () => {
     setAnchorElUser(null);
   };
 
-  const username = Cookie.get("name");
+  const username = Cookies.get("username");
 
   return (
     <AppBar position="static">
@@ -159,7 +159,8 @@ const NavBar = () => {
               >
                 {settings.map((setting) => (
                   <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                    <Typography textAlign="center">{setting}</Typography>
+                    <Link to={"/" + setting.toLowerCase()}><Typography textAlign="center">{setting}</Typography></Link>
+                    
                   </MenuItem>
                 ))}
               </Menu>

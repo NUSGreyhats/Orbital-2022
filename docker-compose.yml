@@ -1,9 +1,5 @@
 version: '3.8'
 
-
-networks:
-  backend:
-
 services:
   frontend:
     container_name: frontend
@@ -20,19 +16,3 @@ services:
       context: ./backend
     ports:
       - 3001:3001
-    networks:
-      - backend
-
-  mongo:
-    container_name: mongo
-    image: mongo:4
-    restart: always
-    volumes:
-      - ./mongodb-data:/data/db
-    logging:
-      driver: none
-    networks:
-      - backend
-    ports:
-      - 27017:27017
-    

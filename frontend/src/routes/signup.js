@@ -11,9 +11,9 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { Navigate } from "react-router";
 import { Copyright } from "../components/copyright";
 import { Link } from "react-router-dom";
+import { register } from "../api/api";
 
 const theme = createTheme();
 
@@ -22,10 +22,20 @@ export default function Signup() {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     // Process login information here
-    const email = data.get("email");
+    const username = data.get("username");
     const password = data.get("password");
     const passwordcfm = data.get("passwordcfm");
     const remember = data.get("remember");
+
+    if (username.length === 0) {
+      alert("Username is required");
+      return;
+    }
+
+    if (password.length === 0) {
+      alert("Password is required");
+      return;
+    }
 
     if (password !== passwordcfm) {
       alert("Password and Confirm Password do not match.");
@@ -36,9 +46,13 @@ export default function Signup() {
       return;
     }
 
-    console.log(email, password);
-
-    <Navigate to="/" />;
+    register(username, password).then((resp) => {
+      document.getElementById("result").innerHTML =
+        resp.data.message ?? resp.data.error;
+      if (!resp.data.error) {
+        document.location.href = "/login";
+      }
+    });
   };
 
   return (
@@ -59,6 +73,8 @@ export default function Signup() {
           <Typography component="h1" variant="h5">
             Sign up
           </Typography>
+          <Typography id="result" component="h1" variant="h6" />
+          <br />
           <Box
             component="form"
             onSubmit={handleSubmit}
@@ -69,10 +85,10 @@ export default function Signup() {
               margin="normal"
               required
               fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
+              id="username"
+              label="Username"
+              name="username"
+              autoComplete="username"
               autoFocus
             />
             <TextField
@@ -90,13 +106,15 @@ export default function Signup() {
               required
               fullWidth
               name="passwordcfm"
-              label="ConfrimPassword"
-              type="passwordcfm"
+              label="Confirm Password"
+              type="password"
               id="passwordcfm"
               autoComplete="current-password"
             />
             <FormControlLabel
-              control={<Checkbox value="agree" color="primary" />}
+              control={
+                <Checkbox name="remember" value="agree" color="primary" />
+              }
               label="I agree to the terms and conditions"
             />
             <Button
